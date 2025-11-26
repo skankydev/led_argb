@@ -1,27 +1,48 @@
-// Terminal.h
-#ifndef DEF_TERMINAL
-#define DEF_TERMINAL
+#pragma once
 
+#include <map>
 #include "setting.h"
 #include "LedManager.h"
 
-class Terminal {
-	private:
-		static Terminal* instance;
-		Terminal();
-		
-		String _currentCmd;
-		LedManager* _leds;
 
-		void processCommand(String cmd);
-		void printLigne(const String& commande, const String& params, const String& aide, const String& couleur = "");
-		void cmdHelp();
+class Terminal {
+public:
+	static Terminal* getInstance();
+	void step();
+
+private:
+	Terminal();
+	static Terminal* instance;
+	LedManager* _leds;
+
+	void printLigne(const String& commande, const String& params, const String& aide, const String& couleur = "bleu");
+
+	// Types pour les handlers de commande
+	typedef void (Terminal::*CommandHandler)();
+	typedef void (Terminal::*CommandHandlerWithParam)(String);
+	std::map<String, CommandHandler> _command;
+	std::map<String, CommandHandlerWithParam> _commandParam;
+
+	// Méthodes de gestion des commandes
+	void setupMap();
+	void doCommand(String cmd);
+
+	void help();
+	void print();
+	void reboot();
+	void setDefault();
+	void demo();
+	void noel();
+	void noelBis();
+	void next();
+	void upBrightness();
+	void downBrightness();
+	void toggleAutoMode();
 	
 
-	public:
-		static Terminal* getInstance();
-		void step();
+	void setColor(String params);
+	void setBrightness(String params);
+	void setMode(String params);
+	void setAutoDelay(String params);
 
 };
-
-#endif

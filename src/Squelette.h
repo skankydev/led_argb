@@ -1,5 +1,4 @@
-#ifndef DEF_Squelette
-#define DEF_Squelette
+#pragma once
 
 #include "setting.h"
 
@@ -13,5 +12,3 @@ class Squelette{
 	public:
 		static Squelette* getInstance();
 };
-
-#endif

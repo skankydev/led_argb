@@ -8,7 +8,6 @@
 #include <TimeLib.h>
 #include <SPI.h>
 #include "function.h"
-using namespace std;
 
 #define NUM_LEDS 60
 

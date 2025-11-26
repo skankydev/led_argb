@@ -1,5 +1,4 @@
-#ifndef DEF_LEDMANAGER
-#define DEF_LEDMANAGER
+#pragma once
 
 #include "setting.h"
 #include <WS2812FX.h>
@@ -13,16 +12,30 @@ class LedManager{
 
 		WS2812FX _ligne1;
 
+		bool _autoMode;
+		unsigned long _lastChange;
+		uint32_t _autoDelay;
+
+
 	public:
 		static LedManager* getInstance();
 
 		void step();
+		void print();
+		void printMode();
+
+		void toggleAutoMode();
+		bool getAutoMode();
+		void setAutoDelay(uint32_t delayMs);
 
 		void setDefault();
+		void setNextEffect(String target = "all");
 		void setEffect(uint8_t mode, String target = "all");
+
 		void setColor(uint32_t color, String target = "all");
 		void setSpeed(uint16_t speed, String target = "all");
 		void setBrightness(uint8_t brightness, String target = "all");
+		uint8_t getBrightness( String target = "all");
 		void demo();
 
 		void noel();
@@ -33,7 +46,5 @@ class LedManager{
 		void rainbow();
 		void scanner();
 		void theaterChaseRainbow();
-		void print();
+		void custome();
 };
-
-#endif

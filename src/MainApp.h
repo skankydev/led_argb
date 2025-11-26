@@ -1,5 +1,4 @@
-#ifndef DEF_MAINAPP
-#define DEF_MAINAPP
+#pragma once
 
 #include "setting.h"
 #include "Terminal.h"
@@ -18,6 +17,3 @@ class MainApp {
 		void init();
 		void step();
 };
-
-
-#endif

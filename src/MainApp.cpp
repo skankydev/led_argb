@@ -23,6 +23,7 @@ void MainApp::init(){
 	_terminal = Terminal::getInstance();
 
 	error("Init ready");
+	//_leds->custome();
 }
 
 /**

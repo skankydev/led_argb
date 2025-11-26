@@ -103,11 +103,11 @@ String getDateIso(){
 }
 
 String strToLower(String text){
-	transform(text.begin(), text.end(),text.begin(), ::tolower);
+	std::transform(text.begin(), text.end(),text.begin(), ::tolower);
 	return text; 
 }
 String strToUpper(String text){
-	transform(text.begin(), text.end(),text.begin(), ::toupper);
+	std::transform(text.begin(), text.end(),text.begin(), ::toupper);
 	return text;
 }
 

@@ -14,16 +14,54 @@ LedManager::LedManager() : _ligne1(NUM_LEDS, PIN_LEDS, NEO_GRB + NEO_KHZ800) {
 
 
 	_ligne1.init();	
-	_ligne1.setBrightness(80);
-	_ligne1.setSpeed(1000);
-	_ligne1.setColor(0x0000FF);  // Bleu
-	_ligne1.setMode(FX_MODE_STATIC);
+	this->setDefault();
 	_ligne1.start();
 
 }
 
 void LedManager::step(){
 	_ligne1.service();
+
+	if(_autoMode) {
+		unsigned long now = millis();
+		if(now - _lastChange > _autoDelay) {
+			this->setNextEffect();
+			_lastChange = now;
+		}
+	}
+}
+
+
+void LedManager::toggleAutoMode() {
+	_autoMode = !_autoMode;
+	if(_autoMode) {
+		_lastChange = millis();  // Reset le timer quand on active
+		success("Auto mode activé");
+	} else {
+		warning("Auto mode désactivé");
+	}
+}
+
+bool LedManager::getAutoMode() {
+	return _autoMode;
+}
+
+void LedManager::setAutoDelay(uint32_t delayMs) {
+	_autoDelay = delayMs;
+	Serial.println(bleu("Auto delay")+" : " + String(delayMs) + "ms");
+}
+
+/**
+ * Change l'effet
+ */
+void LedManager::setNextEffect(String target) {
+	uint32_t mode = _ligne1.getMode();
+	mode += 1;
+	if(mode > 71){
+		mode = 0;
+	}
+	_ligne1.setMode(mode);
+	Serial.println(bleu("Mode") + " : " + rouge(String(mode))+ " -> " + jaune(String(_ligne1.getModeName(mode))));
 }
 
 /**
@@ -31,8 +69,9 @@ void LedManager::step(){
  */
 void LedManager::setEffect(uint8_t mode, String target) {
 	_ligne1.setMode(mode);
-	info("Mode: " + String(_ligne1.getModeName(mode)));
+	Serial.println(bleu("Mode") + " : " + rouge(String(mode))+ " -> " + jaune(String(_ligne1.getModeName(mode))));
 }
+
 
 /**
  * Change la couleur
@@ -52,7 +91,13 @@ void LedManager::setSpeed(uint16_t speed, String target) {
  * Change la luminosité
  */
 void LedManager::setBrightness(uint8_t brightness, String target) {
+	Serial.println(jaune("Brightness")+" : "+String(brightness));
 	_ligne1.setBrightness(brightness);
+}
+
+
+uint8_t LedManager::getBrightness(String target) {
+	return _ligne1.getBrightness();
 }
 
 
@@ -65,11 +110,23 @@ void LedManager::run(){
 }
 
 void LedManager::setDefault(){
-	_ligne1.setBrightness(80);
+	_autoMode = true;
+	_lastChange = 0;
+	_autoDelay = 5000;  // 5 secondes par défaut
+
+	// Effacer tous les segments
+	_ligne1.resetSegments();
+	_ligne1.resetSegmentRuntimes();
+	
+	// Recréer un nouveau segment sur tout le bandeau	
+	_ligne1.setSegment(0, 0, NUM_LEDS-1, FX_MODE_STATIC, 0x0000FF, 1000, false);	
+
+	_ligne1.setBrightness(30);
 	_ligne1.setColor(0x0000FF);
 	_ligne1.setSpeed(1000);
 	_ligne1.setMode(FX_MODE_STATIC);
-	_ligne1.service();
+
+
 }
 
 /**
@@ -158,12 +215,12 @@ void LedManager::print(){
 	uint32_t brightness = _ligne1.getBrightness();
 
 	// Affiche le nom du mode
-	Serial.println(bleu("╭───────────────────────"));
-	Serial.print(bleu("│ Mode")+"       : ");
+	Serial.println(violet("╭───────────────────────"));
+	Serial.print(violet("│ Mode")+"       : ");
 	Serial.println(jaune(_ligne1.getModeName(mode)));
 
 	// Affiche la couleur en hexa
-	Serial.print(bleu("│ Couleur")+"    : ");
+	Serial.print(violet("│ Couleur")+"    : ");
 	uint8_t r = (color >> 16) & 0xFF;
 	uint8_t g = (color >> 8)  & 0xFF;
 	uint8_t b = color & 0xFF;
@@ -173,11 +230,25 @@ void LedManager::print(){
 	Serial.println(jaune("0x"+String(colorStr)));
 
 	// Affiche la vitesse
-	Serial.print(bleu("│ Vitesse")+"    : ");
+	Serial.print(violet("│ Vitesse")+"    : ");
 	Serial.println(jaune(String(speed)));
 
 	// Affiche la luminosité
-	Serial.print(bleu("│ Luminosité")+" : ");
+	Serial.print(violet("│ Luminosité")+" : ");
 	Serial.println(jaune(String(brightness)));
-	Serial.println(bleu("╰───────────────────────"));
+	Serial.println(violet("╰───────────────────────"));
+}
+
+void LedManager::printMode(){
+
+	Serial.println(bleu("╭────────── ")+ "Mode" +bleu(" ─────────────"));
+	for (int i = 0; i < 80; ++i){
+		Serial.println(bleu("│ ")+rouge(String(i))+ " => " + String(_ligne1.getModeName(i)));
+	}
+}
+
+void LedManager::custome(){
+	uint32_t colors[] = {RED, GREEN, BLUE};
+	_ligne1.setSegment(0, 0,29,  FX_MODE_COMET, COLORS(RED, GREEN, BLUE), 1000, false);
+	_ligne1.setSegment(1, 30, 59, FX_MODE_COMET,  COLORS(MAGENTA, PURPLE, ORANGE), 1000 ,true);
 }
