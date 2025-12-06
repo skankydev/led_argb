@@ -1,2 +1,5 @@
-.pio
+platformio.ini
 *.sublime-workspace
+.pio/
+.vscode/
+
