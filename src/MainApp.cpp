@@ -22,6 +22,13 @@ void MainApp::init(){
 	_leds = LedManager::getInstance();
 	_terminal = Terminal::getInstance();
 
+	_wifi = WiFiTool::getInstance();
+	//_wifi->connect();
+
+	_mqtt = MyMqtt::getInstance();
+	_mqtt->init();
+	_mqtt->connect();
+
 	error("Init ready");
 	//_leds->custome();
 }
@@ -33,4 +40,5 @@ void MainApp::init(){
 void MainApp::step(){
 	_leds->step();
 	_terminal->step();
+	_mqtt->step();
 }

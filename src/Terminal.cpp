@@ -123,37 +123,37 @@ void Terminal::help() {
 	printLigne("b+", "", "augment la luminosité", "vert");
 	printLigne("b-", "", "diminu la luminosité", "vert");
 	printLigne("setBrightness", "1-100", "Définit la luminosité", "vert");
-	printLigne("setMode", "1-55", "Définit la luminosité", "vert");
+	printLigne("setMode", "1-71", "Définit la luminosité", "vert");
 	printLigne("setColor", "RRGGBB", "Définit la couleur (ex: FF0000)", "vert");
 	Serial.println(violet("╚══════════════════════════════════════"));
 }
 
 //
 void Terminal::print() {
-    _leds->print();
-    _leds->printMode();
+	_leds->print();
+	_leds->printMode();
 }
 
 void Terminal::reboot() {
-    Serial.println(jauneVif("Redémarrage du système..."));
-    delay(1000);
-    ESP.restart();
+	Serial.println(jauneVif("Redémarrage du système..."));
+	delay(1000);
+	ESP.restart();
 }
 
 void Terminal::setDefault() {
-    _leds->setDefault();
+	_leds->setDefault();
 }
 
 void Terminal::demo() {
-    _leds->demo();
+	_leds->demo();
 }
 
 void Terminal::noel() {
-    _leds->noel();
+	_leds->noel();
 }
 
 void Terminal::noelBis() {
-    _leds->noelBis();
+	_leds->noelBis();
 }
 
 void Terminal::next(){
@@ -161,15 +161,15 @@ void Terminal::next(){
 }
 
 void Terminal::setColor(String params) {
-    if (params.length() == 6) {
-        char colorStr[7] = "0x";
-        params.toCharArray(colorStr + 2, 7);
-        uint32_t color = strtol(colorStr, NULL, 16);
-        _leds->setColor(color);
-        Serial.println(vert("Couleur définie sur 0x" + params));
-    } else {
-        Serial.println(rouge("Format invalide. Utilisez : setcolor RRGGBB"));
-    }
+	if (params.length() == 6) {
+		char colorStr[7] = "0x";
+		params.toCharArray(colorStr + 2, 7);
+		uint32_t color = strtol(colorStr, NULL, 16);
+		_leds->setColor(color);
+		Serial.println(vert("Couleur définie sur 0x" + params));
+	} else {
+		Serial.println(rouge("Format invalide. Utilisez : setcolor RRGGBB"));
+	}
 }
 
 void Terminal::upBrightness(){
@@ -197,7 +197,7 @@ void Terminal::setBrightness(String params){
 
 void Terminal::setMode(String params){
 	uint32_t m = params.toInt();
-	if(m > 55 || m < 0){
+	if(m > 71 || m < 0){
 		return error("Mode inconnue");
 	}
 	_leds->setEffect(m);

@@ -12,7 +12,7 @@ class LedManager{
 
 		WS2812FX _ligne1;
 
-		bool _autoMode;
+		bool _autoMode = false;
 		unsigned long _lastChange;
 		uint32_t _autoDelay;
 

@@ -1,10 +1,7 @@
 #include "MyMqtt.h"
-#include "DB/Table/ConfigTable.h"
 #include "CmdManager.h"
-#include "LedManager.h"
 #include "WiFiTool.h"
-#include "MyRtc.h"
-#include "DB/Table/MessageTable.h"
+
 
 void mqttReceived(String &topic, String &message) {
 	Serial.println(cyan("Mqtt")+vert(" RECIVE : ") + topic + " - " + message);
@@ -34,6 +31,7 @@ void MyMqtt::init(){
 	_timoutReco += RECO_TIMER;
 
 	this->readConf();
+	success("Mqtt init");
 }
 
 void MyMqtt::readConf(){
@@ -67,9 +65,14 @@ void MyMqtt::step(){
 bool MyMqtt::connect(){
 
 	warning("MQTT Connecting");
-	uint8_t count;
+	Serial.println(jaune(String(MQTT_SERVER))+" - "+jaune(String(MQTT_PORT)));
+	uint8_t count = 0;
 	this->readConf();
-	while (!_mqttClient.connect(String(ESP.getEfuseMac()).c_str(), "", "") && count < 10) {
+
+	/*uint64_t chipid = ESP.getEfuseMac();
+	String clientId = "ESP32-" + String((uint32_t)chipid, HEX);
+*/
+	while (!_mqttClient.connect(_login.c_str(), "", "") && count < 10) {
 		Serial.print(".");
 		delay(1000);
 		count++;
@@ -77,11 +80,14 @@ bool MyMqtt::connect(){
 
 	if(_mqttClient.connected()){
 		success("MQTT Connected!");
-		_mqttClient.subscribe(_topicConfig);
-		LedManager::getInstance()->mqttOk();
+		bool subOk = _mqttClient.subscribe(_topicConfig,0);
+		Serial.println("Subscribe to: " + bleu(_topicConfig) + " -> " + (subOk ? vertVif("OK") : rouge("FAILED")));
+
+		//Serial.println(bleuVif("Topic Config")+" : "+vert(_topicConfig));
+		//LedManager::getInstance()->mqttOk();
 	}else{
 		error("MQTT not Connected!");
-		LedManager::getInstance()->wifiKo();
+		//LedManager::getInstance()->wifiKo();
 	}
 
 	return true;

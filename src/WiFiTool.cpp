@@ -1,8 +1,5 @@
 #include "WiFiTool.h"
-#include "Config.h"
 #include "CmdManager.h"
-#include "LedManager.h"
-#include "DB/Table/ConfigTable.h"
 
 void WiFiEvent(WiFiEvent_t event) {
 	//Serial.println(vert("[Lan-event]")+ " event : "+vertVif(String(event)));
@@ -16,7 +13,7 @@ void WiFiEvent(WiFiEvent_t event) {
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_START:
-			//warning("WiFi client started");
+			warning("WiFi client started");
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_STOP:
@@ -28,8 +25,7 @@ void WiFiEvent(WiFiEvent_t event) {
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-			error("Disconnected from WiFi access point");
-			LedManager::getInstance()->wifiKo();
+			//error("Disconnected from WiFi access point");
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE: 
@@ -37,7 +33,7 @@ void WiFiEvent(WiFiEvent_t event) {
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-			Serial.println("WiFi IP : "+vert(getIpString(WiFi.localIP())));
+			Serial.println("WiFi IP : "+vert(WiFi.localIP().toString()));
 			Serial.println("WiFi Mac : "+WiFi.macAddress() );
 			break;
 
@@ -66,7 +62,6 @@ void WiFiEvent(WiFiEvent_t event) {
 			success("Client connected"); 
 			break;
 		case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
-			LedManager::getInstance()->wifiKo();
 			error("Client disconnected"); 
 			break;
 		case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
@@ -177,11 +172,9 @@ void WiFiTool::connect() {
 		error("Wifi Marche pas");
 		if(!_isLoged){
 			_isLoged = true;
-			logError("[wifi] Not Connected");
 		}
 	}else{
 		_isLoged = false;
-		logInfo("[wifi] Connected");
 	}
 
 }
@@ -226,14 +219,8 @@ String WiFiTool::scanNetworks(){
 String WiFiTool::update(String file) {
 
 	String url = "";
-	#ifdef HTTPS
-		WiFiClientSecure client;
-		client.setInsecure();
-		url = "https://"+String(SERVER);
-	#else
-		WiFiClient client;
-		url = "http://"+String(SERVER);
-	#endif
+	WiFiClient client;
+	url = "http://skankyhome";
 
 	httpUpdate.onStart(update_started);
     httpUpdate.onEnd(update_finished);

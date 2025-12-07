@@ -110,9 +110,9 @@ void LedManager::run(){
 }
 
 void LedManager::setDefault(){
-	_autoMode = true;
+	_autoMode = false;
 	_lastChange = 0;
-	_autoDelay = 5000;  // 5 secondes par défaut
+	_autoDelay = 5000; 
 
 	// Effacer tous les segments
 	_ligne1.resetSegments();

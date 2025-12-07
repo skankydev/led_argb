@@ -13,4 +13,6 @@
 
 #define PIN_LEDS 13
 
+#define RECO_TIMER 300000
+
 #endif

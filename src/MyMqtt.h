@@ -13,14 +13,13 @@ class MyMqtt{
 		MyMqtt();
 
 		WiFiClient _wifiClient;
-
 		MQTTClient _mqttClient;
+
 		String _login;
 		String _topicMesure;
 		String _topicConfig;
 		bool _lastConnected;
 		uint64_t _timoutReco;
-		uint64_t _timoutOldMessage;
 		uint64_t _lastReconnect = 0;
 
 	public:
