@@ -95,6 +95,30 @@ void LedManager::setBrightness(uint8_t brightness, String target) {
 	_ligne1.setBrightness(brightness);
 }
 
+void LedManager::setSegments(JsonArray segments, String target){
+	int id = 0;
+
+	_ligne1.resetSegments();
+	_ligne1.resetSegmentRuntimes();
+
+	for(JsonVariant segment : segments) {
+
+		uint16_t first = segment["first"].as<uint16_t>();
+		uint16_t last = segment["last"].as<uint16_t>();
+		uint8_t effect = segment["effect"].as<uint8_t>();
+		uint16_t speed = segment["speed"].as<uint16_t>();
+		bool reverse = segment["reverse"].as<bool>();
+		
+		JsonArray colors = segment["colors"].as<JsonArray>();
+		uint32_t color[4];
+		color[0] = convertColor(colors[0]) | 0;
+		color[1] = convertColor(colors[1]) | 0;
+		color[2] = convertColor(colors[2]) | 0;
+
+		_ligne1.setSegment(id, first, last, effect, color, speed, reverse);
+		id++;
+	}
+}
 
 uint8_t LedManager::getBrightness(String target) {
 	return _ligne1.getBrightness();
@@ -128,6 +152,8 @@ void LedManager::setDefault(){
 
 
 }
+
+
 
 /**
  * Effet Noël - Twinkle Random rouge/vert

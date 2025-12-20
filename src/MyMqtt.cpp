@@ -35,9 +35,9 @@ void MyMqtt::init(){
 }
 
 void MyMqtt::readConf(){
-	_login = "led_master";
-	_topicMesure = "skankyhome/info/"+_login;
-	_topicConfig = "skankyhome/cmd/"+_login;
+	_login = "led_test";
+	_topicMessage = "skankyhome/info/"+_login;
+	_topicCmd = "skankyhome/cmd/"+_login;
 }
 
 
@@ -80,10 +80,10 @@ bool MyMqtt::connect(){
 
 	if(_mqttClient.connected()){
 		success("MQTT Connected!");
-		bool subOk = _mqttClient.subscribe(_topicConfig,0);
-		Serial.println("Subscribe to: " + bleu(_topicConfig) + " -> " + (subOk ? vertVif("OK") : rouge("FAILED")));
+		bool subOk = _mqttClient.subscribe(_topicCmd,0);
+		Serial.println("Subscribe to: " + bleu(_topicCmd) + " -> " + (subOk ? vertVif("OK") : rouge("FAILED")));
 
-		//Serial.println(bleuVif("Topic Config")+" : "+vert(_topicConfig));
+		//Serial.println(bleuVif("Topic Config")+" : "+vert(_topicCmd));
 		//LedManager::getInstance()->mqttOk();
 	}else{
 		error("MQTT not Connected!");
@@ -94,8 +94,8 @@ bool MyMqtt::connect(){
 }
 
 void MyMqtt::send(String message){
-	Serial.println(cyan("Mqtt")+jaune(" SEND : ") + _topicMesure + " - " + message);
-	_mqttClient.publish(_topicMesure, message);
+	Serial.println(cyan("Mqtt")+jaune(" SEND : ") + _topicMessage + " - " + message);
+	_mqttClient.publish(_topicMessage, message);
 }
 
 bool MyMqtt::connected(){
@@ -103,6 +103,6 @@ bool MyMqtt::connected(){
 }
 
 bool MyMqtt::disconnect(){
-	_mqttClient.unsubscribe(_topicConfig);
+	_mqttClient.unsubscribe(_topicCmd);
 	return _mqttClient.disconnect();
 }

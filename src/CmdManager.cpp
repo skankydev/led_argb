@@ -17,11 +17,13 @@ CmdManager::CmdManager() {
 
 void CmdManager::newCmd(String message){
 
-	info(message);
 	JsonDocument cmd;
 	deserializeJson(cmd, message);
 	if(cmd["color"].is<JsonVariant>()){
 		String colorStr = cmd["color"].as<String>();
+		if(colorStr.startsWith("#")){
+			colorStr = colorStr.substring(1);
+		}
 		uint32_t color = strtol(colorStr.c_str(), NULL, 16);
 		_leds->setColor(color);
 	}
@@ -31,4 +33,8 @@ void CmdManager::newCmd(String message){
 		_leds->setEffect(effect);
 	}
 
+	if(cmd["segments"].is<JsonVariant>()){
+		Serial.println("segments");
+		_leds->setSegments(cmd["segments"].as<JsonArray>());
+	}
 }

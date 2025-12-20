@@ -124,7 +124,7 @@ void Terminal::help() {
 	printLigne("b-", "", "diminu la luminosité", "vert");
 	printLigne("setBrightness", "1-100", "Définit la luminosité", "vert");
 	printLigne("setMode", "1-71", "Définit la luminosité", "vert");
-	printLigne("setColor", "RRGGBB", "Définit la couleur (ex: FF0000)", "vert");
+	printLigne("setColor", "#RRGGBB", "Définit la couleur (ex: FF0000)", "vert");
 	Serial.println(violet("╚══════════════════════════════════════"));
 }
 
@@ -161,12 +161,13 @@ void Terminal::next(){
 }
 
 void Terminal::setColor(String params) {
-	if (params.length() == 6) {
-		char colorStr[7] = "0x";
-		params.toCharArray(colorStr + 2, 7);
-		uint32_t color = strtol(colorStr, NULL, 16);
+	if (params.length() >= 6) {
+		if(params.startsWith("#")){
+			params = params.substring(1);
+		}
+		uint32_t color = strtol(params.c_str(), NULL, 16);
 		_leds->setColor(color);
-		Serial.println(vert("Couleur définie sur 0x" + params));
+		Serial.println(vert("Couleur définie sur")+" : "+bleu(" #" + params));
 	} else {
 		Serial.println(rouge("Format invalide. Utilisez : setcolor RRGGBB"));
 	}

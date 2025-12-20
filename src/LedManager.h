@@ -2,6 +2,7 @@
 
 #include "setting.h"
 #include <WS2812FX.h>
+#include <ArduinoJson.h>
 
 class LedManager{
 
@@ -36,6 +37,9 @@ class LedManager{
 		void setSpeed(uint16_t speed, String target = "all");
 		void setBrightness(uint8_t brightness, String target = "all");
 		uint8_t getBrightness( String target = "all");
+
+		void setSegments(JsonArray segments, String target = "all");
+
 		void demo();
 
 		void noel();

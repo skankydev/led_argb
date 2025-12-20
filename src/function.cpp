@@ -16,6 +16,7 @@ void printDate(){
 	String time = getTimeString();
 	Serial.println(date + " " + time);
 }
+
 String getTimeString(){
 	time_t tm = now();
 	int h,m,s;
@@ -99,6 +100,14 @@ String getDateIso(){
 	date += "m"+tmp;
 
 	return date;
+
+}
+
+uint32_t convertColor(String color){
+	if(color.startsWith("#")){
+		color = color.substring(1);
+	}
+	return strtol(color.c_str(), NULL, 16);
 
 }
 

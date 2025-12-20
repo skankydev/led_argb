@@ -12,6 +12,7 @@ String getDateIso();
 String strToLower(String text);
 String strToUpper(String text);
 
+uint32_t convertColor(String color);
 
 void text(String message);
 void info(String message);

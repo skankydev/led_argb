@@ -16,8 +16,9 @@ class MyMqtt{
 		MQTTClient _mqttClient;
 
 		String _login;
-		String _topicMesure;
-		String _topicConfig;
+		String _topicMessage;
+		String _topicCmd;
+		
 		bool _lastConnected;
 		uint64_t _timoutReco;
 		uint64_t _lastReconnect = 0;
