@@ -4,7 +4,7 @@
 
 
 void mqttReceived(String &topic, String &message) {
-	Serial.println(cyan("Mqtt")+vert(" RECIVE : ") + topic + " - " + message);
+	println(vert("RECIVE : ") + topic + " - " + message,"MQTT");
 	CmdManager::getInstance()->newCmd(message);
 }
 
@@ -64,37 +64,31 @@ void MyMqtt::step(){
 
 bool MyMqtt::connect(){
 
-	warning("MQTT Connecting");
-	Serial.println(jaune(String(MQTT_SERVER))+" - "+jaune(String(MQTT_PORT)));
+	warning("MQTT Connecting","MQTT");
+	println(jaune(String(MQTT_SERVER))+" - "+jaune(String(MQTT_PORT)),"MQTT");
 	uint8_t count = 0;
 	this->readConf();
 
-	/*uint64_t chipid = ESP.getEfuseMac();
-	String clientId = "ESP32-" + String((uint32_t)chipid, HEX);
-*/
 	while (!_mqttClient.connect(_login.c_str(), "", "") && count < 10) {
 		Serial.print(".");
 		delay(1000);
 		count++;
 	}
+	Serial.print("\n");
 
 	if(_mqttClient.connected()){
-		success("MQTT Connected!");
+		success("MQTT Connected!","MQTT");
 		bool subOk = _mqttClient.subscribe(_topicCmd,0);
-		Serial.println("Subscribe to: " + bleu(_topicCmd) + " -> " + (subOk ? vertVif("OK") : rouge("FAILED")));
-
-		//Serial.println(bleuVif("Topic Config")+" : "+vert(_topicCmd));
-		//LedManager::getInstance()->mqttOk();
+		println("Subscribe to: " + bleu(_topicCmd) + " -> " + (subOk ? vertVif("OK") : rouge("FAILED")),"MQTT");
 	}else{
-		error("MQTT not Connected!");
-		//LedManager::getInstance()->wifiKo();
+		error("MQTT not Connected!","MQTT");
 	}
 
 	return true;
 }
 
 void MyMqtt::send(String message){
-	Serial.println(cyan("Mqtt")+jaune(" SEND : ") + _topicMessage + " - " + message);
+	println(jaune("SEND : ") + _topicMessage + " - " + message,"MQTT");
 	_mqttClient.publish(_topicMessage, message);
 }
 

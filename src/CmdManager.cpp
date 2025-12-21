@@ -1,5 +1,7 @@
 #include "CmdManager.h"
 #include <ArduinoJson.h>
+#include "MyMqtt.h"
+
 
 CmdManager *CmdManager::instance = nullptr;
 
@@ -19,6 +21,11 @@ void CmdManager::newCmd(String message){
 
 	JsonDocument cmd;
 	deserializeJson(cmd, message);
+	if(cmd["timestamp"].is<JsonVariant>()){
+		setTime(cmd["timestamp"].as<uint32_t>());
+		println(vert("Time is set") +" : "+getDateTime(),"CMD" );
+	}
+
 	if(cmd["color"].is<JsonVariant>()){
 		String colorStr = cmd["color"].as<String>();
 		if(colorStr.startsWith("#")){
@@ -34,7 +41,21 @@ void CmdManager::newCmd(String message){
 	}
 
 	if(cmd["segments"].is<JsonVariant>()){
-		Serial.println("segments");
 		_leds->setSegments(cmd["segments"].as<JsonArray>());
 	}
+
+	if(cmd["update"].is<JsonVariant>()){
+		WiFiTool::getInstance()->update(cmd["update"].is<Sring>());
+	}
+}
+
+void CmdManager::sayHello(){
+
+	JsonDocument cmd;
+	cmd["cmd"] = "hello";
+	cmd["data"]["version"] = VERSION;
+
+	String message;
+	serializeJson(cmd,message);
+	MyMqtt::getInstance()->send(message);
 }

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "setting.h"
+#include <LittleFS.h>
 #include "Terminal.h"
 #include "LedManager.h"
 #include "WiFiTool.h"
 #include "MyMqtt.h"
+#include "CmdManager.h"
 
 class MainApp {
 
@@ -14,6 +16,7 @@ class MainApp {
 		Terminal* _terminal;
 		WiFiTool* _wifi;
 		MyMqtt* _mqtt;
+		CmdManager* _cmd;
 
 	public:
 		MainApp();

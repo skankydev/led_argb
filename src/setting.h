@@ -9,6 +9,7 @@
 #include <SPI.h>
 #include "function.h"
 
+#define VERSION 0.01
 #define NUM_LEDS 60
 
 #define PIN_LEDS 13

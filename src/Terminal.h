@@ -38,6 +38,10 @@ private:
 	void upBrightness();
 	void downBrightness();
 	void toggleAutoMode();
+	void format();
+	void files();
+	void system();
+
 	
 
 	void setColor(String params);

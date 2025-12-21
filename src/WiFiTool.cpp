@@ -5,7 +5,7 @@ void WiFiEvent(WiFiEvent_t event) {
 	//Serial.println(vert("[Lan-event]")+ " event : "+vertVif(String(event)));
 	switch (event) {
 		case ARDUINO_EVENT_WIFI_READY:
-			success("WiFi interface ready");
+			//success("WiFi interface ready");
 			break;
 
 		case ARDUINO_EVENT_WIFI_SCAN_DONE:
@@ -13,62 +13,20 @@ void WiFiEvent(WiFiEvent_t event) {
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_START:
-			warning("WiFi client started");
+			warning("WiFi client started","WIFI");
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_STOP:
-			warning("WiFi clients stopped");
+			warning("WiFi clients stopped","WIFI");
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-			info("Connected to access point");
-			break;
-
-		case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-			//error("Disconnected from WiFi access point");
-			break;
-
-		case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE: 
-			//warning("Authentication mode of access point has changed"); 
+			info("Connected to access point","WIFI");
 			break;
 
 		case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-			Serial.println("WiFi IP : "+vert(WiFi.localIP().toString()));
-			Serial.println("WiFi Mac : "+WiFi.macAddress() );
-			break;
-
-		case ARDUINO_EVENT_WIFI_STA_LOST_IP:        
-			error("Lost IP address and IP address is reset to 0"); 
-			break;
-		case ARDUINO_EVENT_WPS_ER_SUCCESS:
-			success("WiFi Protected Setup (WPS): succeeded in enrollee mode"); 
-			break;
-		case ARDUINO_EVENT_WPS_ER_FAILED:
-			error("WiFi Protected Setup (WPS): failed in enrollee mode"); 
-			break;
-		case ARDUINO_EVENT_WPS_ER_TIMEOUT:
-			warning("WiFi Protected Setup (WPS): timeout in enrollee mode"); 
-			break;
-		case ARDUINO_EVENT_WPS_ER_PIN:
-			warning("WiFi Protected Setup (WPS): pin code in enrollee mode"); 
-			break;
-		case ARDUINO_EVENT_WIFI_AP_START:
-			info("WiFi access point started"); 
-			break;
-		case ARDUINO_EVENT_WIFI_AP_STOP:
-			info("WiFi access point stopped"); 
-			break;
-		case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
-			success("Client connected"); 
-			break;
-		case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
-			error("Client disconnected"); 
-			break;
-		case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
-			info("Assigned IP address to client"); 
-			break;
-		case ARDUINO_EVENT_WIFI_AP_PROBEREQRECVED:
-			Serial.println("Received probe request"); 
+			println("WiFi IP : "+vert(WiFi.localIP().toString()),"WIFI");
+			println("WiFi Mac : "+WiFi.macAddress() ,"WIFI");
 			break;
 
 		case ARDUINO_EVENT_WIFI_AP_GOT_IP6:
@@ -86,19 +44,19 @@ void WiFiEvent(WiFiEvent_t event) {
 }
 
 void update_started() {
-	Serial.println("CALLBACK:  HTTP update process started");
+	Serial.println("CALLBACK: HTTP update process started");
 }
 
 void update_finished() {
-	Serial.println("CALLBACK:  HTTP update process finished");
+	Serial.println("CALLBACK: HTTP update process finished");
 }
 
 void update_progress(int cur, int total) {
-	Serial.printf("CALLBACK:  HTTP update process at %d of %d bytes...\n", cur, total);
+	Serial.printf("CALLBACK: HTTP update process at %d of %d bytes...\n", cur, total);
 }
 
 void update_error(int err) {
-	Serial.printf("CALLBACK:  HTTP update fatal error code %d\n", err);
+	Serial.printf("CALLBACK: HTTP update fatal error code %d\n", err);
 }
 
 WiFiTool* WiFiTool::instance = nullptr;
@@ -151,11 +109,11 @@ bool WiFiTool::connected() {
  */
 void WiFiTool::connect() {
 
-	Serial.println(vert("Connexion au réseau WiFi ")+bleuVif(_name)+" - "+rougeVif(_pass));
+	println(vert("Connexion au réseau WiFi ")+bleuVif(_name)+" - "+rougeVif(_pass),"WIFI");
 	if(_name.length() == 0){
 		this->readConfig();
 		if(_name.length() == 0){
-			error("Wifi non configuré");
+			error("Wifi non configuré","WIFI");
 			return;
 		}
 	}
@@ -164,12 +122,12 @@ void WiFiTool::connect() {
 	Serial.println(" ");
 	while (WiFi.status() != WL_CONNECTED && count < 10) {
 		delay(1000);
-		Serial.print(bleu("."));
+		//Serial.println(bleu("."));
 		count++;
 	}
 	Serial.println(" ");
 	if(WiFi.status() != WL_CONNECTED){
-		error("Wifi Marche pas");
+		error("Wifi Marche pas","WIFI");
 		if(!_isLoged){
 			_isLoged = true;
 		}
@@ -196,12 +154,12 @@ void WiFiTool::reset() {}
 
 
 String WiFiTool::scanNetworks(){
-	Serial.println("Scan des réseaux WiFi disponibles...");
+	warning("Scan des réseaux WiFi disponibles...","WIFI");
 	int numReseaux = WiFi.scanNetworks();
 	String result = "";
 
 	if (numReseaux == 0) {
-		Serial.println("Aucun réseau trouvé.");
+		error("Aucun réseau trouvé.","WIFI");
 	} else {
 		Serial.print(numReseaux);
 		Serial.println(" réseaux trouvés :");
@@ -220,12 +178,12 @@ String WiFiTool::update(String file) {
 
 	String url = "";
 	WiFiClient client;
-	url = "http://skankyhome";
+	url = "http://"+String(WEB_SERVER);
 
 	httpUpdate.onStart(update_started);
-    httpUpdate.onEnd(update_finished);
-    httpUpdate.onProgress(update_progress);
-    httpUpdate.onError(update_error);
+	httpUpdate.onEnd(update_finished);
+	httpUpdate.onProgress(update_progress);
+	httpUpdate.onError(update_error);
 
 	String detination = url+file ;
 	info("Updat : "+detination);
@@ -234,15 +192,15 @@ String WiFiTool::update(String file) {
 
 	switch (ret) {
 		case HTTP_UPDATE_FAILED:
-			error("HTTP_UPDATE_FAILED Error");
+			error("HTTP_UPDATE_FAILED Error","WIFI");
 			break;
 
 		case HTTP_UPDATE_NO_UPDATES:
-			info("HTTP_UPDATE_NO_UPDATES");
+			info("HTTP_UPDATE_NO_UPDATES","WIFI");
 			break;
 
 		case HTTP_UPDATE_OK:
-			success("HTTP_UPDATE_OK");
+			success("HTTP_UPDATE_OK","WIFI");
 			break;
 	}
 	return String("200");

@@ -15,4 +15,6 @@ class CmdManager{
 		static CmdManager* getInstance();
 
 		void newCmd(String message); 
+
+		void sayHello();
 };

@@ -48,7 +48,7 @@ bool LedManager::getAutoMode() {
 
 void LedManager::setAutoDelay(uint32_t delayMs) {
 	_autoDelay = delayMs;
-	Serial.println(bleu("Auto delay")+" : " + String(delayMs) + "ms");
+	println(bleu("Auto delay")+" : " + String(delayMs) + "ms","LED");
 }
 
 /**
@@ -61,7 +61,7 @@ void LedManager::setNextEffect(String target) {
 		mode = 0;
 	}
 	_ligne1.setMode(mode);
-	Serial.println(bleu("Mode") + " : " + rouge(String(mode))+ " -> " + jaune(String(_ligne1.getModeName(mode))));
+	println(bleu("Mode") + " : " + rouge(String(mode))+ " -> " + jaune(String(_ligne1.getModeName(mode))),"LED");
 }
 
 /**
@@ -69,7 +69,7 @@ void LedManager::setNextEffect(String target) {
  */
 void LedManager::setEffect(uint8_t mode, String target) {
 	_ligne1.setMode(mode);
-	Serial.println(bleu("Mode") + " : " + rouge(String(mode))+ " -> " + jaune(String(_ligne1.getModeName(mode))));
+	println(bleu("Mode") + " : " + rouge(String(mode))+ " -> " + jaune(String(_ligne1.getModeName(mode))),"LED");
 }
 
 
@@ -91,7 +91,7 @@ void LedManager::setSpeed(uint16_t speed, String target) {
  * Change la luminosité
  */
 void LedManager::setBrightness(uint8_t brightness, String target) {
-	Serial.println(jaune("Brightness")+" : "+String(brightness));
+	println(jaune("Brightness")+" : "+String(brightness),"LED");
 	_ligne1.setBrightness(brightness);
 }
 
@@ -143,17 +143,9 @@ void LedManager::setDefault(){
 	_ligne1.resetSegmentRuntimes();
 	
 	// Recréer un nouveau segment sur tout le bandeau	
-	_ligne1.setSegment(0, 0, NUM_LEDS-1, FX_MODE_STATIC, 0x0000FF, 1000, false);	
-
-	_ligne1.setBrightness(30);
-	_ligne1.setColor(0x0000FF);
-	_ligne1.setSpeed(1000);
-	_ligne1.setMode(FX_MODE_STATIC);
-
-
+	_ligne1.setSegment(0, 0, NUM_LEDS-1, FX_MODE_RAINBOW_CYCLE, 0x0000FF, 1500, false);	
+	_ligne1.setBrightness(50);
 }
-
-
 
 /**
  * Effet Noël - Twinkle Random rouge/vert

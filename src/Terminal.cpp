@@ -1,5 +1,5 @@
 #include "Terminal.h"
-
+#include "DataSaver.h"
 
 
 Terminal* Terminal::instance = nullptr;
@@ -29,6 +29,11 @@ void Terminal::setupMap() {
 	_command["b+"] = &Terminal::upBrightness;
 	_command["b-"] = &Terminal::downBrightness;
 	_command["auto"] = &Terminal::toggleAutoMode;
+	_command["format"] = &Terminal::format;
+	_command["files"] = &Terminal::files;
+	_command["system"] = &Terminal::system;
+
+
 
 
 
@@ -112,8 +117,11 @@ void Terminal::doCommand(String cmd) {
 void Terminal::help() {
 	Serial.println(violet("╔══════════ ")+ vertVif("Terminal Commands")+violet(" ══════════"));
 	printLigne("help","","Affiche cette aide","bleu");
-	printLigne("print","","Affiche cette aide","bleu");
+	printLigne("print","","Affiche les information de l esp","bleu");
+	printLigne("files","","Affiche tout les fichier","bleu");
+	printLigne("system","","Affiche les information System","bleu");
 	printLigne("reboot","","Comme son nom l'indique","rouge");
+	printLigne("format","","supprime tout les fichier","rouge");
 	printLigne("default","","reset config","vert");
 	printLigne("demo","","demo de quelque effet","vert");
 	printLigne("noel", "", "Effet Noel twinkle rouge/vert", "vert");
@@ -134,10 +142,24 @@ void Terminal::print() {
 	_leds->printMode();
 }
 
+
 void Terminal::reboot() {
-	Serial.println(jauneVif("Redémarrage du système..."));
+	println(jauneVif("Redémarrage du système..."),"CLI");
 	delay(1000);
 	ESP.restart();
+}
+
+void Terminal::files() {
+	DataSaver::doListAll();
+}
+
+void Terminal::format() {
+	DataSaver::doFormat();
+}
+
+void Terminal::system() {
+	printSystemInfo();
+	printAllPartitions();
 }
 
 void Terminal::setDefault() {
@@ -167,9 +189,9 @@ void Terminal::setColor(String params) {
 		}
 		uint32_t color = strtol(params.c_str(), NULL, 16);
 		_leds->setColor(color);
-		Serial.println(vert("Couleur définie sur")+" : "+bleu(" #" + params));
+		println(vert("Couleur définie sur")+" : "+bleu(" #" + params),"CLI");
 	} else {
-		Serial.println(rouge("Format invalide. Utilisez : setcolor RRGGBB"));
+		println(rouge("Format invalide. Utilisez : setcolor RRGGBB"),"CLI");
 	}
 }
 

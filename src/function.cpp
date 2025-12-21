@@ -1,106 +1,38 @@
 #include "function.h"
+#include <WiFi.h>
+#include <LittleFS.h>
+#include <esp_ota_ops.h>
+#include <esp_partition.h>
 
-// These read 16- and 32-bit types from the SD card file.
-// BMP data is stored little-endian, Arduino is little-endian too.
-// May need to reverse subscript order if porting elsewhere.
-
-
-String getDate(){
-	String date = getDateString();
-	String time = getTimeString();
-	return date + " " + time;
+void setTime(time_t timestamp) {
+	struct timeval tv;
+	tv.tv_sec = timestamp;
+	tv.tv_usec = 0;
+	settimeofday(&tv, NULL);
 }
 
-void printDate(){
-	String date = getDateString();
-	String time = getTimeString();
-	Serial.println(date + " " + time);
+String getTime() {
+	time_t now = time(nullptr);
+	struct tm* timeinfo = localtime(&now);
+	char buffer[9];
+	strftime(buffer, sizeof(buffer), "%H:%M:%S", timeinfo);
+	return String(buffer);
 }
 
-String getTimeString(){
-	time_t tm = now();
-	int h,m,s;
-	String hs,ms,ss;
-	h = hour(tm);
-	m = minute(tm);
-	s = second(tm);
-
-	hs = String(h);
-	ms = String(m);
-	ss = String(s);
-
-	if(hs.length() == 1){
-		hs = "0"+hs;
-	}
-	if(ms.length() == 1){
-		ms = "0"+ms;
-	}
-	if(ss.length() == 1){
-		ss = "0"+ss;
-	}
-
-	return hs+":"+ms+":"+ss;
+String getDate() {
+	time_t now = time(nullptr);
+	struct tm* timeinfo = localtime(&now);
+	char buffer[11];
+	strftime(buffer, sizeof(buffer), "%Y-%m-%d", timeinfo);
+	return String(buffer);
 }
 
-String getDateString(){
-	time_t tm = now();
-	int d, m, y;
-	String ds,ms,ys;
-	d = day(tm);
-	m = month(tm);
-	y = year(tm);
-
-	ds = String(d);
-	ms = String(m);
-	ys = String(y);
-
-	if(ds.length() == 1){
-		ds = "0"+ds;
-	}
-	if(ms.length() == 1){
-		ms = "0"+ms;
-	}
-
-	return ds+"/"+ms+"/"+ys;
-}
-
-
-String getDateIso(){
-	String date = "";
-	time_t tm = now();
-	date += String(year(tm));
-	String tmp;
-	tmp = String(month(tm));
-	if(tmp.length() == 1){
-		tmp = "0"+tmp;
-	}
-	date += "-"+tmp;
-	tmp = String(day(tm));
-	if(tmp.length() == 1){
-		tmp = "0"+tmp;
-	}
-	date += "-"+tmp;
-
-	tmp = String(hour(tm));
-	if(tmp.length() == 1){
-		tmp = "0"+tmp;
-	}
-	date += "T"+tmp;
-
-	tmp = String(minute(tm));
-	if(tmp.length() == 1){
-		tmp = "0"+tmp;
-	}
-	date += "h"+tmp;
-
-	tmp = String(second(tm));
-	if(tmp.length() == 1){
-		tmp = "0"+tmp;
-	}
-	date += "m"+tmp;
-
-	return date;
-
+String getDateTime(String format) {
+	time_t now = time(nullptr);
+	struct tm* timeinfo = localtime(&now);
+	char buffer[64];
+	strftime(buffer, sizeof(buffer), format.c_str(), timeinfo);
+	return String(buffer);
 }
 
 uint32_t convertColor(String color){
@@ -108,7 +40,13 @@ uint32_t convertColor(String color){
 		color = color.substring(1);
 	}
 	return strtol(color.c_str(), NULL, 16);
+}
 
+void println(String message,String cat){
+	String toPrint = violet("["+getTime()+"]");
+	toPrint += " "+cyan("["+cat+"]")+" ";
+	toPrint += message;
+	Serial.println(toPrint);
 }
 
 String strToLower(String text){
@@ -121,20 +59,20 @@ String strToUpper(String text){
 }
 
 
-void info(String message){
-	Serial.println("\033[36m"+message+"\033[0m");
+void info(String message,String cat){
+	println("\033[36m"+message+"\033[0m",cat);
 }
 
-void warning(String message){
-	Serial.println("\033[33m"+message+"\033[0m");
+void warning(String message,String cat){
+	println("\033[33m"+message+"\033[0m",cat);
 }
 
-void error(String message){
-	Serial.println("\033[31m"+message+"\033[0m");
+void error(String message,String cat){
+	println("\033[31m"+message+"\033[0m",cat);
 }
 
-void success(String message){
-	Serial.println("\033[92m"+message+"\033[0m");
+void success(String message,String cat){
+	println("\033[92m"+message+"\033[0m",cat);
 }
 
 String noir(String message){return "\033[30m"+message+"\033[0m";}
@@ -181,15 +119,15 @@ String formatBytes(uint32_t bytes) {
 }
 
 String formatBytesPretty(uint32_t bytes) {
-    if (bytes < 1024) {
-        return String(bytes) + vert(" B");
-    } else if (bytes < (1024 * 1024)) {
-        return String(bytes / 1024.0) + vertVif(" KB");
-    } else if (bytes < (1024 * 1024 * 1024)) {
-        return String(bytes / (1024.0 * 1024.0)) + jaune(" MB");
-    } else {
-        return String(bytes / (1024.0 * 1024.0 * 1024.0)) + rouge(" GB");
-    }
+	if (bytes < 1024) {
+		return String(bytes) + vert(" B");
+	} else if (bytes < (1024 * 1024)) {
+		return String(bytes / 1024.0) + vertVif(" KB");
+	} else if (bytes < (1024 * 1024 * 1024)) {
+		return String(bytes / (1024.0 * 1024.0)) + jaune(" MB");
+	} else {
+		return String(bytes / (1024.0 * 1024.0 * 1024.0)) + rouge(" GB");
+	}
 }
 
 String getResetReason(int reason) {
@@ -213,3 +151,120 @@ String getResetReason(int reason) {
 	}
 }
 
+void printSystemInfo() {
+	println(vertVif("═══════════════════════════════════════════"), "SYSTEM");
+	
+	// Chip Info
+	esp_chip_info_t chip_info;
+	esp_chip_info(&chip_info);
+	
+	println(cyan("Chip: ") + String(ESP.getChipModel()) + " Rev " + String(chip_info.revision), "SYSTEM");
+	println(cyan("Cores: ") + String(chip_info.cores), "SYSTEM");
+	println(cyan("Frequency: ") + String(ESP.getCpuFreqMHz()) + " MHz", "SYSTEM");
+	
+	// Memory Info
+	println(vertVif("───────────────────────────────────────────"), "SYSTEM");
+	uint32_t freeHeap = ESP.getFreeHeap();
+	uint32_t totalHeap = ESP.getHeapSize();
+	uint32_t usedHeap = totalHeap - freeHeap;
+	float heapPercent = (usedHeap * 100.0) / totalHeap;
+	
+	println(cyan("Heap Total: ") + formatBytesPretty(totalHeap), "MEMORY");
+	println(cyan("Heap Used: ") + formatBytesPretty(usedHeap) + String(" (") + String(heapPercent, 1) + "%)", "MEMORY");
+	println(cyan("Heap Free: ") + formatBytesPretty(freeHeap), "MEMORY");
+	
+	// PSRAM si disponible
+	if (psramFound()) {
+		uint32_t freePsram = ESP.getFreePsram();
+		uint32_t totalPsram = ESP.getPsramSize();
+		uint32_t usedPsram = totalPsram - freePsram;
+		float psramPercent = (usedPsram * 100.0) / totalPsram;
+		
+		println(cyan("PSRAM Total: ") + formatBytesPretty(totalPsram), "MEMORY");
+		println(cyan("PSRAM Used: ") + formatBytesPretty(usedPsram) + String(" (") + String(psramPercent, 1) + "%)", "MEMORY");
+		println(cyan("PSRAM Free: ") + formatBytesPretty(freePsram), "MEMORY");
+	}
+	
+	// Flash Info
+	println(vertVif("───────────────────────────────────────────"), "SYSTEM");
+	uint32_t flashSize = ESP.getFlashChipSize();
+	println(cyan("Flash Size: ") + formatBytesPretty(flashSize), "FLASH");
+	println(cyan("Flash Speed: ") + String(ESP.getFlashChipSpeed() / 1000000) + " MHz", "FLASH");
+	
+	// Sketch Info
+	uint32_t sketchSize = ESP.getSketchSize();
+	uint32_t sketchFree = ESP.getFreeSketchSpace();
+	uint32_t sketchTotal = sketchSize + sketchFree;
+	float sketchPercent = (sketchSize * 100.0) / sketchTotal;
+	
+	println(cyan("Sketch Used: ") + formatBytesPretty(sketchSize) + String(" (") + String(sketchPercent, 1) + "%)", "FLASH");
+	println(cyan("Sketch Free: ") + formatBytesPretty(sketchFree), "FLASH");
+	
+	// Reset Info
+	println(vertVif("───────────────────────────────────────────"), "SYSTEM");
+	println(cyan("Reset Reason: ") + getResetReason(esp_reset_reason()), "SYSTEM");
+	println(cyan("Uptime: ") + String(millis() / 1000) + " seconds", "SYSTEM");
+	
+	// MAC Address
+	println(cyan("MAC Address: ") + WiFi.macAddress(), "SYSTEM");
+	
+	println(vertVif("═══════════════════════════════════════════"), "LITTLEFS");
+	
+	uint32_t totalBytes = LittleFS.totalBytes();
+	uint32_t usedBytes = LittleFS.usedBytes();
+	uint32_t freeBytes = totalBytes - usedBytes;
+	float fsPercent = (usedBytes * 100.0) / totalBytes;
+	
+	println(cyan("LittleFS Total: ") + formatBytesPretty(totalBytes), "FS");
+	println(cyan("LittleFS Used: ") + formatBytesPretty(usedBytes) + String(" (") + String(fsPercent, 1) + "%)", "FS");
+	println(cyan("LittleFS Free: ") + formatBytesPretty(freeBytes), "FS");
+	
+}
+
+void printAllPartitions() {
+	println(vertVif("═══════════════════════════════════════════"), "PARTITIONS");
+	
+	esp_partition_iterator_t it = esp_partition_find(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, NULL);
+	
+	while (it != NULL) {
+		const esp_partition_t* part = esp_partition_get(it);
+		
+		String type;
+		switch(part->type) {
+			case ESP_PARTITION_TYPE_APP:  type = "APP"; break;
+			case ESP_PARTITION_TYPE_DATA: type = "DATA"; break;
+			default: type = "UNKNOWN";
+		}
+		
+		String subtype;
+		if (part->type == ESP_PARTITION_TYPE_APP) {
+			switch(part->subtype) {
+				case ESP_PARTITION_SUBTYPE_APP_FACTORY: subtype = "factory"; break;
+				case ESP_PARTITION_SUBTYPE_APP_OTA_0: subtype = "ota_0"; break;
+				case ESP_PARTITION_SUBTYPE_APP_OTA_1: subtype = "ota_1"; break;
+				default: subtype = "ota_" + String(part->subtype - ESP_PARTITION_SUBTYPE_APP_OTA_0);
+			}
+		} else if (part->type == ESP_PARTITION_TYPE_DATA) {
+			switch(part->subtype) {
+				case ESP_PARTITION_SUBTYPE_DATA_OTA: subtype = "ota"; break;
+				case ESP_PARTITION_SUBTYPE_DATA_NVS: subtype = "nvs"; break;
+				case ESP_PARTITION_SUBTYPE_DATA_SPIFFS: subtype = "spiffs"; break;
+				case ESP_PARTITION_SUBTYPE_DATA_FAT: subtype = "fat"; break;
+				default: subtype = "data";
+			}
+		}
+		
+		println(
+			cyan(String(part->label).length() > 0 ? part->label : "unnamed") + 
+			" [" + type + "/" + subtype + "] " +
+			"@ 0x" + String(part->address, HEX) + " - " +
+			formatBytesPretty(part->size),
+			"PARTITION"
+		);
+		
+		it = esp_partition_next(it);
+	}
+	
+	esp_partition_iterator_release(it);
+	println(vertVif("═══════════════════════════════════════════"), "PARTITIONS");
+}

@@ -1,24 +1,26 @@
-#ifndef DEF_FUNCTION
-#define DEF_FUNCTION
+#pragma once
 
 #include "setting.h"
+#include <time.h>
 
+void setTime(time_t timestamp);
+String getTime();
+String getDate();
+String getDateTime(String format = "%Y-%m-%d %H:%M:%S");
 
-void printDate();
-String getTimeString();
-String getDateString();
-String getDateIso();
+void println(String message,String cat = "SYS");
 
 String strToLower(String text);
 String strToUpper(String text);
 
+
+
 uint32_t convertColor(String color);
 
-void text(String message);
-void info(String message);
-void warning(String message);
-void error(String message);
-void success(String message);
+void info(String message,String cat = "SYS");
+void warning(String message,String cat = "SYS");
+void error(String message,String cat = "SYS");
+void success(String message,String cat = "SYS");
 
 String noir(String message);
 String rouge(String message);
@@ -43,5 +45,5 @@ String toBin(uint16_t val);
 String formatBytes(uint32_t bytes);
 String formatBytesPretty(uint32_t bytes);
 String getResetReason(int reason);
-
-#endif
+void printSystemInfo();
+void printAllPartitions();

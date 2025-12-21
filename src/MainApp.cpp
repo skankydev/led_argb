@@ -15,6 +15,12 @@ void MainApp::init(){
 	Serial.begin(115200);
 	success("LED ARGB - WS2812FX");
 
+	if(!LittleFS.begin(true)){
+		Serial.println("LittleFS Mount Failed");
+		return;
+	}
+
+
 	int reason = esp_reset_reason();
 	String message = getResetReason(reason);
 	info(message);
@@ -30,7 +36,11 @@ void MainApp::init(){
 	_mqtt->connect();
 
 	error("Init ready");
-	//_leds->custome();
+
+	_cmd = CmdManager::getInstance();
+	if(_mqtt->connected()){
+		_cmd->sayHello();
+	}
 }
 
 /**
