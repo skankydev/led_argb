@@ -28,7 +28,6 @@ void Terminal::setupMap() {
 	_command["next"] = &Terminal::next;
 	_command["b+"] = &Terminal::upBrightness;
 	_command["b-"] = &Terminal::downBrightness;
-	_command["auto"] = &Terminal::toggleAutoMode;
 	_command["format"] = &Terminal::format;
 	_command["files"] = &Terminal::files;
 	_command["system"] = &Terminal::system;
@@ -41,7 +40,6 @@ void Terminal::setupMap() {
 	_commandParam["setColor"] = &Terminal::setColor;
 	_commandParam["setBrightness"] = &Terminal::setBrightness;
 	_commandParam["setMode"] = &Terminal::setMode;
-	_commandParam["setAutoDelay"] = &Terminal::setAutoDelay;
 
 }
 
@@ -127,7 +125,6 @@ void Terminal::help() {
 	printLigne("noel", "", "Effet Noel twinkle rouge/vert", "vert");
 	printLigne("noelBis", "", "Effet Noel fire flicker", "vert");
 	printLigne("next", "", "passe aui mode suivant", "vert");
-	printLigne("auto", "", "active/desactive le mode auto", "vert");
 	printLigne("b+", "", "augment la luminosité", "vert");
 	printLigne("b-", "", "diminu la luminosité", "vert");
 	printLigne("setBrightness", "1-100", "Définit la luminosité", "vert");
@@ -139,7 +136,20 @@ void Terminal::help() {
 //
 void Terminal::print() {
 	_leds->print();
-	_leds->printMode();
+	//_leds->printMode();
+	Serial.println(violet("═══════════════")+ vertVif("Scenario")+violet("════════════"));
+	String content = DataSaver::read("scenario.json");
+	Serial.println(content);
+
+	JsonDocument scenario;
+	DeserializationError err = deserializeJson(scenario, content);
+	if (err) {
+		warning("Scenario deserialize failed ");
+		error(err.c_str());
+		return;
+	}
+	serializeJsonPretty(scenario,Serial);
+
 }
 
 
@@ -224,13 +234,4 @@ void Terminal::setMode(String params){
 		return error("Mode inconnue");
 	}
 	_leds->setEffect(m);
-}
-
-void Terminal::toggleAutoMode(){
-	_leds->toggleAutoMode();
-}
-
-void Terminal::setAutoDelay(String params){
-	uint32_t d = params.toInt();
-	_leds->setAutoDelay(d);
 }

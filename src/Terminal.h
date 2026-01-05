@@ -37,7 +37,6 @@ private:
 	void next();
 	void upBrightness();
 	void downBrightness();
-	void toggleAutoMode();
 	void format();
 	void files();
 	void system();
@@ -47,6 +46,5 @@ private:
 	void setColor(String params);
 	void setBrightness(String params);
 	void setMode(String params);
-	void setAutoDelay(String params);
 
 };

@@ -19,7 +19,7 @@ MyMqtt *MyMqtt::getInstance() {
 	return instance;
 }
 
-MyMqtt::MyMqtt() : _wifiClient(), _mqttClient(1024)  {}
+MyMqtt::MyMqtt() : _wifiClient(), _mqttClient(4096)  {}
 
 void MyMqtt::init(){
 	_mqttClient.setKeepAlive(60);

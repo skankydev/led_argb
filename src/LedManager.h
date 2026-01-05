@@ -11,9 +11,16 @@ class LedManager{
 		LedManager();
 
 
-		WS2812FX _ligne1;
+		WS2812FX _ligne0;
 
-		bool _autoMode = false;
+		JsonDocument _scenario;
+
+		uint64_t _timerLigne0 = 0;
+		uint8_t _keyLine0 = 0;
+		uint64_t _lastChangeLine0 = 0;
+
+		bool _scenarioMode = false;
+
 		unsigned long _lastChange;
 		uint32_t _autoDelay;
 
@@ -25,9 +32,8 @@ class LedManager{
 		void print();
 		void printMode();
 
-		void toggleAutoMode();
-		bool getAutoMode();
-		void setAutoDelay(uint32_t delayMs);
+		bool initScenario();
+		void newScenario(JsonObject scenario);
 
 		void setDefault();
 		void setNextEffect(String target = "all");
@@ -51,4 +57,6 @@ class LedManager{
 		void scanner();
 		void theaterChaseRainbow();
 		void custome();
+
+		
 };

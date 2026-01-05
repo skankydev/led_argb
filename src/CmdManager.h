@@ -10,6 +10,10 @@ class CmdManager{
 		CmdManager();
 
 		LedManager* _leds;
+		String _scenarioId = "";
+		String _buffer = "";
+		int _targetChunks = 0;
+		int _receivedChunks = 0;
 
 	public:
 		static CmdManager* getInstance();
