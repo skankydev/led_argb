@@ -19,10 +19,12 @@ monitor_filters =
 monitor_echo = yes
 
 build_flags = 
+	-std=c++17
     -DWIFI_SSID=\"ton_ssid\"
-    -DWIFI_PASSWORD=\"ton_password\"
-    -DMQTT_SERVER=\"ton_server\"
-    -DMQTT_PORT=1883
+	-DWIFI_PASSWORD=\"ton_password\"
+	-DMQTT_SERVER=\"ton_server_mqtt\"
+	-DWEB_SERVER=\"ton_server_web\"
+	-DMQTT_PORT=1883
 
 
 

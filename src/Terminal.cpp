@@ -22,9 +22,6 @@ void Terminal::setupMap() {
 	_command["print"] = &Terminal::print;
 	_command["reboot"] = &Terminal::reboot;
 	_command["default"] = &Terminal::setDefault;
-	_command["demo"] = &Terminal::demo;
-	_command["noel"] = &Terminal::noel;
-	_command["noelBis"] = &Terminal::noelBis;
 	_command["next"] = &Terminal::next;
 	_command["b+"] = &Terminal::upBrightness;
 	_command["b-"] = &Terminal::downBrightness;
@@ -121,9 +118,6 @@ void Terminal::help() {
 	printLigne("reboot","","Comme son nom l'indique","rouge");
 	printLigne("format","","supprime tout les fichier","rouge");
 	printLigne("default","","reset config","vert");
-	printLigne("demo","","demo de quelque effet","vert");
-	printLigne("noel", "", "Effet Noel twinkle rouge/vert", "vert");
-	printLigne("noelBis", "", "Effet Noel fire flicker", "vert");
 	printLigne("next", "", "passe aui mode suivant", "vert");
 	printLigne("b+", "", "augment la luminosité", "vert");
 	printLigne("b-", "", "diminu la luminosité", "vert");
@@ -135,7 +129,7 @@ void Terminal::help() {
 
 //
 void Terminal::print() {
-	_leds->print();
+	//_leds->print();
 	//_leds->printMode();
 	Serial.println(violet("═══════════════")+ vertVif("Scenario")+violet("════════════"));
 	String content = DataSaver::read("scenario.json");
@@ -176,17 +170,6 @@ void Terminal::setDefault() {
 	_leds->setDefault();
 }
 
-void Terminal::demo() {
-	_leds->demo();
-}
-
-void Terminal::noel() {
-	_leds->noel();
-}
-
-void Terminal::noelBis() {
-	_leds->noelBis();
-}
 
 void Terminal::next(){
 	_leds->setNextEffect();

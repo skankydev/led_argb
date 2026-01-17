@@ -35,7 +35,7 @@ void MyMqtt::init(){
 }
 
 void MyMqtt::readConf(){
-	_login = "led_test";
+	_login = "master_led";
 	_topicMessage = "skankyhome/info/"+_login;
 	_topicCmd = "skankyhome/cmd/"+_login;
 }

@@ -10,9 +10,11 @@
 #include "function.h"
 
 #define VERSION 0.01
-#define NUM_LEDS 60
+#define NUM_LEDS 90
 
-#define PIN_LEDS 13
+#define PIN_LEDS_0 13
+#define PIN_LEDS_1 15
+#define PIN_LEDS_2 16
 
 #define RECO_TIMER 300000
 
