@@ -90,7 +90,7 @@ void LedConfig::setDefault() {
 	_line.resetSegments();
 	_line.resetSegmentRuntimes();
 	_line.setSegment(0, 0, NUM_LEDS-1, FX_MODE_RAINBOW_CYCLE, 0x0000FF, 1500, false);
-	_line.setBrightness(50);
+	_line.setBrightness(100);
 }
 
 uint32_t LedConfig::getMode() {
