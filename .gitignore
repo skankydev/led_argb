@@ -2,4 +2,5 @@ platformio.ini
 *.sublime-workspace
 .pio/
 .vscode/
-
+.claude/
+CLAUDE.md

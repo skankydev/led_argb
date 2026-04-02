@@ -5,15 +5,22 @@
 #include <map>
 #include <ArduinoJson.h>
 
+enum AppMode {
+	MODE_SCENARIO,
+	MODE_LIVE
+};
+
 class LedManager {
 	private:
 		static LedManager* instance;
 		LedManager();
 
 		std::map<String, LedConfig*> _lines;
-		
+
 		JsonDocument _scenario;
 		bool _scenarioMode = false;
+
+		AppMode _appMode = MODE_SCENARIO;
 
 		unsigned long _lastChange;
 		uint32_t _autoDelay;
@@ -27,6 +34,9 @@ class LedManager {
 
 		bool initScenario();
 		void newScenario(JsonObject scenario);
+
+		void setAppMode(AppMode mode);
+		AppMode getAppMode();
 
 		void setDefault();
 		void setNextEffect(String target = "all");

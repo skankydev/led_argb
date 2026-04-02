@@ -22,9 +22,27 @@ void CmdManager::newCmd(String message){
 
 	JsonDocument cmd;
 	deserializeJson(cmd, message);
+
+	// Cible optionnelle : "0", "1", "2" ou "all" (défaut)
+	String line = "all";
+	if(cmd["line"].is<JsonVariant>()){
+		line = cmd["line"].as<String>();
+	}
+
 	if(cmd["timestamp"].is<JsonVariant>()){
 		setTime(cmd["timestamp"].as<uint32_t>());
 		println(vert("Time is set") +" : "+getDateTime(),"CMD" );
+	}
+
+	if(cmd["mode"].is<JsonVariant>()){
+		String mode = cmd["mode"].as<String>();
+		if(mode == "live"){
+			_leds->setAppMode(MODE_LIVE);
+		} else if(mode == "scenario"){
+			_leds->setAppMode(MODE_SCENARIO);
+		} else {
+			println(rouge("Mode inconnu : ") + mode, "CMD");
+		}
 	}
 
 	if(cmd["color"].is<JsonVariant>()){
@@ -33,16 +51,26 @@ void CmdManager::newCmd(String message){
 			colorStr = colorStr.substring(1);
 		}
 		uint32_t color = strtol(colorStr.c_str(), NULL, 16);
-		_leds->setColor(color);
+		_leds->setColor(color, line);
 	}
 
 	if(cmd["effect"].is<JsonVariant>()){
 		unsigned int effect = cmd["effect"].as<unsigned int>();
-		_leds->setEffect(effect);
+		_leds->setEffect(effect, line);
+	}
+
+	if(cmd["speed"].is<JsonVariant>()){
+		uint16_t speed = cmd["speed"].as<uint16_t>();
+		_leds->setSpeed(speed, line);
+	}
+
+	if(cmd["brightness"].is<JsonVariant>()){
+		uint8_t brightness = cmd["brightness"].as<uint8_t>();
+		_leds->setBrightness(brightness, line);
 	}
 
 	if(cmd["segments"].is<JsonVariant>()){
-		_leds->setSegments(cmd["segments"].as<JsonArray>());
+		_leds->setSegments(cmd["segments"].as<JsonArray>(), line);
 	}
 
 	if(cmd["update"].is<JsonVariant>()){

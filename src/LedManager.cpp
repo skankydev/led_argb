@@ -52,19 +52,22 @@ void LedManager::step() {
 		config->service();
 	}
 
+	// En mode live on laisse les commandes directes agir, pas de scénario
+	if(_appMode == MODE_LIVE) return;
+
 	if(_scenarioMode) {
 		unsigned long now = millis();
-		
+
 		// Gérer chaque ligne indépendamment
 		for(auto& [name, config] : _lines) {
 			String lineName = "line_" + name;
-			
+
 			if(config->needsUpdate(now)) {
 				// Vérifier si la step existe
 				if(!_scenario[lineName]["steps"][config->getKey()].is<JsonVariant>()) {
 					config->resetKey();
 				}
-				
+
 				// Charger et appliquer la step
 				JsonObject step = _scenario[lineName]["steps"][config->getKey()];
 				config->applyStep(step);
@@ -72,6 +75,26 @@ void LedManager::step() {
 			}
 		}
 	}
+}
+
+void LedManager::setAppMode(AppMode mode) {
+	if(mode == _appMode) return;
+
+	if(mode == MODE_SCENARIO) {
+		// Reprise depuis le début
+		for(auto& [name, config] : _lines) {
+			config->resetKey();
+		}
+		println(vert("Mode SCENARIO"),"LED");
+	} else {
+		println(jaune("Mode LIVE"),"LED");
+	}
+
+	_appMode = mode;
+}
+
+AppMode LedManager::getAppMode() {
+	return _appMode;
 }
 
 /*void LedManager::print() {
