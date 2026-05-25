@@ -26,8 +26,6 @@ build_flags =
 	-DWEB_SERVER=\"ton_server_web\"
 	-DMQTT_PORT=1883
 
-
-
 lib_deps = 
 	bblanchon/ArduinoJson
 	paulstoffregen/Time@^1.6.1

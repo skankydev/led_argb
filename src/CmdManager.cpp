@@ -77,6 +77,12 @@ void CmdManager::newCmd(String message){
 		WiFiTool::getInstance()->update(cmd["update"].as<String>());
 	}
 
+	if(cmd["reboot"].is<JsonVariant>()){
+		println(jauneVif("Reboot demandé via MQTT..."),"CMD");
+		delay(500);
+		ESP.restart();
+	}
+
 	/*if(cmd["scenario"].is<JsonVariant>()){
 		_leds->newScenario(cmd["scenario"].as<JsonObject>());
 	}*/

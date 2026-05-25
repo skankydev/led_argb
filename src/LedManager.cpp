@@ -29,10 +29,17 @@ LedManager::LedManager() : _scenario() {
 
 bool LedManager::initScenario() {
 	String content = DataSaver::read("scenario.json");
+	if(content.isEmpty()) {
+		warning("Pas de scenario.json","LED");
+		return false;
+	}
 	DeserializationError err = deserializeJson(_scenario, content);
 	if (err) {
-		warning("Scenario deserialize failed ");
+		warning("Scenario deserialize failed ","LED");
 		error(err.c_str());
+		// Fichier corrompu → on supprime pour éviter la boucle au prochain boot
+		DataSaver::clear("scenario.json");
+		warning("scenario.json supprimé (corrompu)","LED");
 		return false;
 	}
 	success("Scenario Ok");
